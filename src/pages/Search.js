@@ -4,7 +4,7 @@ import Accordion from "../components/Accordion";
 import AppContext from "../context/AppContext";
 
 function Search() {
-  const { postData } = useContext(AppContext);
+  const { postData, setSelectedTag } = useContext(AppContext);
   const [tagData, setTagData] = useState([
     {
       tagTitle: "Tech1111111",
@@ -45,11 +45,14 @@ function Search() {
 
             if (tempTarget) {
               tempTarget.count += 1;
+              tempTarget.postArr.push(nowPostData.path);
+
+              tempTarget.postArr = [...new Set(tempTarget.postArr)];
             } else {
               tempArr.push({
                 tagTitle: tag,
                 count: 1,
-                postArr: [],
+                postArr: [nowPostData.path],
               });
             }
           });
@@ -59,7 +62,6 @@ function Search() {
         }
       });
     }
-
     setTagData(tempArr);
   }, [postData]);
 
@@ -67,7 +69,15 @@ function Search() {
     <Accordion title="Tags" initialExpanded isBold>
       <TagWrap>
         {tagData.map((one, index) => (
-          <Tag key={index}>
+          <Tag
+            key={index}
+            onClick={() => {
+              setSelectedTag({
+                tagTitle: one.tagTitle,
+                path: one.postArr,
+              });
+            }}
+          >
             {one.tagTitle} <span> {one.count}</span>
           </Tag>
         ))}

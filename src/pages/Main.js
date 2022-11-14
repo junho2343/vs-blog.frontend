@@ -24,6 +24,7 @@ function Main() {
     postData,
     setOpenPost,
     openPost,
+    selectedTag,
   } = useContext(AppContext);
 
   const listArr = [
@@ -61,6 +62,8 @@ function Main() {
     },
   ];
 
+  const data = getPostOne(postData, selectedPost);
+
   return (
     <Wrap>
       <LeftBar>
@@ -96,48 +99,60 @@ function Main() {
       )}
 
       <RightWrap selected={selected}>
-        <RightHeader visible={openPost.length !== 0 ? true : false}>
-          {openPost.map((one, index) => {
-            const data = getPostOne(postData, one);
+        {selectedTag ? (
+          <RightTagContent>
+            <h2>
+              {selectedTag.tagTitle} 관련 글 목록{" "}
+              <span>({selectedTag.path.length} 개)</span>
+            </h2>
+            <div>
+              {selectedTag.path.map((path) => {
+                const tagData = getPostOne(postData, path);
 
-            return (
-              <div
-                className={selectedPost === one ? "selected" : ""}
-                onClick={() => {
-                  setSelectedPost(data.path);
-                }}
-                key={index}
-              >
-                📝 {data.title}
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation();
+                return <div>{tagData.title}</div>;
+              })}
+            </div>
+          </RightTagContent>
+        ) : (
+          <>
+            <RightHeader visible={openPost.length !== 0 ? true : false}>
+              {openPost.map((one, index) => {
+                const data = getPostOne(postData, one);
 
-                    const openPostFilter = openPost.filter(
-                      (one) => one !== data.path
-                    );
-                    setOpenPost(openPostFilter);
+                return (
+                  <div
+                    className={selectedPost === one ? "selected" : ""}
+                    onClick={() => {
+                      setSelectedPost(data.path);
+                    }}
+                    key={index}
+                  >
+                    📝 {data.title}
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
 
-                    setSelectedPost(
-                      openPostFilter.length !== 0 ? openPostFilter[0] : null
-                    );
-                  }}
-                >
-                  &#215;
-                </span>
-              </div>
-            );
-          })}
-        </RightHeader>
-        <RightContent
-          selected={selected}
-          visible={openPost.length !== 0 ? true : false}
-        >
-          {(() => {
-            const data = getPostOne(postData, selectedPost);
+                        const openPostFilter = openPost.filter(
+                          (one) => one !== data.path
+                        );
+                        setOpenPost(openPostFilter);
 
-            return (
-              data && (
+                        setSelectedPost(
+                          openPostFilter.length !== 0 ? openPostFilter[0] : null
+                        );
+                      }}
+                    >
+                      &#215;
+                    </span>
+                  </div>
+                );
+              })}
+            </RightHeader>
+            <RightContent
+              selected={selected}
+              visible={openPost.length !== 0 ? true : false}
+            >
+              {data && (
                 <>
                   <p>{data.path}</p>
                   <div>
@@ -184,10 +199,10 @@ function Main() {
                     </div>
                   </div>
                 </>
-              )
-            );
-          })()}
-        </RightContent>
+              )}
+            </RightContent>
+          </>
+        )}
       </RightWrap>
     </Wrap>
   );
@@ -245,6 +260,19 @@ const RightHeader = styled.div`
       top: 10px;
     }
   }
+`;
+
+const RightTagContent = styled.div`
+  width: 100%;
+  height: 100%;
+  background-color: ${({ theme }) => theme.color.primary};
+  padding: 10px 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  overflow-y: scroll;
 `;
 
 const RightContent = styled.div`
