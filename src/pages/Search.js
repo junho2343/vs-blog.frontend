@@ -93,7 +93,7 @@ const TagWrap = styled.div`
   flex-wrap: wrap;
 `;
 const Tag = styled.div`
-  padding: 10px;
+  padding: 5px 10px;
   margin: 5px;
   border-radius: 10px;
   background-color: ${({ theme }) => theme.color.selected};
